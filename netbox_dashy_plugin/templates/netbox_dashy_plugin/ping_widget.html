@@ -1,7 +1,8 @@
 {% load i18n %}
 {% if has_permission %}
 <div class="mb-3">
-    <form method="post" action="{% url 'plugins:netbox_dashy:ping_view'}"></form>
+    <form method="post" action="{% url 'plugins:netbox_dashy:ping_view'}" id="pingInput"></form>
+    {% csrf_token %}
     <label class="form-label">Ping</label>
     <div class="row g-2">
       <div class="col">
@@ -30,7 +31,21 @@
     </div>
     </form>
   </div>
-  
+  <script>
+    $(document).ready(function() {
+            $('#pingForm').on('submit', function(event) {
+                event.preventDefault();
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: $(this).attr('method'),
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        $('#result').html(response.message);
+                    }
+                });
+            });
+        });
+  </script>
 {% elif not has_permission %}
   <div class="text-muted text-center">
     <i class="mdi mdi-lock-outline"></i> {% trans "No permission to view this content" %}.
